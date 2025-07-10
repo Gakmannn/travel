@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Hiking {
+  id                Int       @id @default(autoincrement())
+  title             String
+  title_en          String  
+  description       String
+  meta_title        String    
+  meta_description  String    
+  meta_keywords     String    
+  price             Int
+  mainImage         String
+  active            Boolean   @default(false)
+  primary           Boolean   @default(false)
+  image             Image[]
+  reviews           Reviews[]
+  @@map("hiking")
+}
+
+model Image {
+  id    Int      @id @default(autoincrement())
+  img   String   
+  hiking_id Int
+  hiking Hiking   @relation(fields: [hiking_id], references: [id])
+  @@map("image")
+}
+
+model Reviews {
+  id            Int      @id @default(autoincrement())
+  img           String
+  name          String   
+  text          String   
+  hiking_id     Int
+  approved      Boolean
+  hiking Hiking   @relation(fields: [hiking_id], references: [id])
+  @@map("reviews")
+}
