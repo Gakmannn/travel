@@ -60,7 +60,7 @@ const micro = [
   //     'https://domain.ru'+post.value.img,
   //   ]
   // }
-]
+] as any
 useHead({
   script: [{ type: 'application/ld+json', innerHTML: micro }]
 })

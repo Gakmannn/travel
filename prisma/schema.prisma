@@ -49,3 +49,12 @@ model Reviews {
   hiking Hiking   @relation(fields: [hiking_id], references: [id])
   @@map("reviews")
 }
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  pass  String
+  token  String @unique @default(uuid())
+  approved Boolean
+  @@map("user")
+}

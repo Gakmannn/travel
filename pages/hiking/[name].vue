@@ -9,23 +9,24 @@
 // const main = data[1].data
 
 const route = useRoute()
-const id = parseInt(route.params.name)
+const id = route.params.name && typeof route.params.name=='string' ? parseInt(route.params.name) : 1
 const {data} = await useFetch(`/api/hiking/${id}`)
 // if (`${id}_${data.value.title_en}`!==route.params.name) {
 //   await navigateTo(`/hiking/${id}_${data.value.title_en}`)
 // }
 
-
-useSeoMeta({
-  title: data.value.meta_title,
-  ogTitle: data.value.meta_title,
-  description: data.value.meta_description,
-  ogDescription: data.value.meta_description,
-  keywords: data.value.meta_keywords,
-  // !!! Указать имя домена
-  ogImage: 'https://domain.ru/'+data.value.mainImage,
-  twitterCard: 'summary_large_image',
-})
+if (data.value) {
+  useSeoMeta({
+    title: data.value.meta_title,
+    ogTitle: data.value.meta_title,
+    description: data.value.meta_description,
+    ogDescription: data.value.meta_description,
+    keywords: data.value.meta_keywords,
+    // !!! Указать имя домена
+    ogImage: 'https://domain.ru/'+data.value.mainImage,
+    twitterCard: 'summary_large_image',
+  })
+}
 const micro = [
   // !!! Нужен event
   // {
@@ -71,7 +72,7 @@ const micro = [
   //     'https://domain.ru'+post.value.img,
   //   ]
   // }
-]
+] as any
 useHead({
   script: [ { type:'application/ld+json', innerHTML: micro} ]
 })

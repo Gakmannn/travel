@@ -3,9 +3,9 @@
 </template>
 
 <script setup lang="ts">
-  const route = useRoute()
-  const num = +route.query.page || 1 as number
-  const {data} = await useFetch(`/api/hiking/pagination/${num}`)
+const route = useRoute()
+const num = route.query.page ? +route.query.page : 1
+const {data} = await useFetch(`/api/hiking/pagination/${num}`)
   
 // useSeoMeta({
 //   title: data.value.title,
