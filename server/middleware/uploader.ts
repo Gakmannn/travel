@@ -1,11 +1,12 @@
 import Busboy from 'busboy'
 import path from 'path'
 import sharp from 'sharp'
+import convert from 'heic-convert'
 
 export default defineEventHandler(async (event) => {
   if (event.method === 'POST'||event.method === 'PUT') {
     const contentType = getRequestHeader(event, "content-type")
-    console.log('hit', contentType?.includes('multipart/form-data;'))
+    // console.log('hit', contentType?.includes('multipart/form-data;'))
     if (contentType?.includes('multipart/form-data;')) await useFiles(event)
   }
 })
@@ -48,32 +49,15 @@ const useFiles = async (event: any) => {
       const busboy = Busboy({ headers: req.headers })
       let i = 1
       busboy.on('file', (name, file, info) => {
-        console.log(fields)
+        // console.log(fields)
         const { filename, encoding, mimeType } = info
-        
-        //! #############################################################################################
-        const { promisify } = require('util')
-        const fs = require('fs')
-        const convert = require('heic-convert')
-
-        (async () => {
-          const inputBuffer = await promisify(fs.readFile)('/path/to/my/image.heic');
-          const outputBuffer = await convert({
-            buffer: inputBuffer, // the HEIC file buffer
-            format: 'JPEG',      // output format
-            quality: 1           // the jpeg compression quality, between 0 and 1
-          })
-          await promisify(fs.writeFile)('./result.jpg', outputBuffer);
-        })()
-        //! #############################################################################################
-        
 
         // const newFileName = info.filename
         const newFileName = translit(fields.newName + ' ' + i ) + '.webp'
         i++
-        console.log(`File [${name}]: filename: ${filename}, encoding: ${encoding}, mimeType: ${mimeType}`)
-        console.log(path.join(process.cwd(), '../public/img/img'))
-        const saveTo = path.join(process.cwd(), '../public/img', `${newFileName}`)
+        // console.log(`File [${name}]: filename: ${filename}, encoding: ${encoding}, mimeType: ${mimeType}`)
+        // console.log(path.join(process.cwd(), '../public/img/img'))
+        const saveTo = path.join(process.cwd(), 'public/img', `${newFileName}`)
         // console.log('saveTo', saveTo)
         // file.pipe(fs.createWriteStream(saveTo))
         const data = [] as any
@@ -86,6 +70,16 @@ const useFiles = async (event: any) => {
           // merge data chunks with buffer and attach them to body
           fileAsBuffer = Buffer.concat(data)
           
+          if (filename.toLowerCase().endsWith('heic')) {
+            const uint8Array = new Uint8Array(fileAsBuffer.buffer, fileAsBuffer.byteOffset, fileAsBuffer.byteLength) as never as ArrayBufferLike
+            const outputBuffer = await convert({
+              buffer: uint8Array,
+              format: 'JPEG',
+              quality: 1
+            })
+            fileAsBuffer = outputBuffer
+          }
+
           await sharp(fileAsBuffer)
           .webp({ quality: 70 })
           // .resize({ width: 1920 })

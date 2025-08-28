@@ -46,15 +46,22 @@ model Reviews {
   text          String   
   hiking_id     Int
   approved      Boolean
-  hiking Hiking   @relation(fields: [hiking_id], references: [id])
+  hiking        Hiking   @relation(fields: [hiking_id], references: [id])
   @@map("reviews")
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  pass  String
-  token  String @unique @default(uuid())
-  approved Boolean
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  pass      String
+  token     String  @unique @default(uuid())
+  approved  Boolean
+  roles     Role[]
   @@map("user")
+}
+
+model Role {
+  id    Int     @id @default(autoincrement())
+  name  String
+  user  User[]
 }
